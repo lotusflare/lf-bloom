@@ -1,0 +1,29 @@
+name: Merge Gatekeeper
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  merge-gatekeeper:
+    runs-on: general-nano-arm-v2
+    concurrency:
+      group: merge-gatekeeper-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          # required
+          app-id: ${{ vars.LF_GH_APP_ID }}
+          private-key: ${{ secrets.LF_GH_APP_PRIVATE_KEY }}
+
+      - name: Run Merge Gatekeeper
+        run: |
+          merge-gatekeeper validate \
+          --token=${{ steps.app-token.outputs.token }} \
+          --self="merge-gatekeeper" \
+          --interval=30 \
+          --ref=${{ github.event.pull_request.head.sha }} \
+          --timeout=1200

@@ -1,0 +1,24 @@
+name: cron-close-stale-issues
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  close-issues:
+    name: "close-stale-issues: close unactive PR/issue"
+    runs-on: general-nano-arm-v2
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          operations-per-run: 200
+          days-before-stale: 7
+          days-before-close: 7
+          exempt-pr-labels: "not ready for merge,DO NOT MERGE"
+          exempt-issue-labels: "not ready for merge,DO NOT MERGE"
+          stale-pr-message: "This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions"
+          stale-issue-message: "This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions"
